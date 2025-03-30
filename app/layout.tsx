@@ -14,6 +14,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <head>
+                <link rel="icon" href="https://astrid.place/favicon.ico" />
+            </head>
             <body className="dark:bg-black dark:text-white">
                 <Navbar />
                 {children}
