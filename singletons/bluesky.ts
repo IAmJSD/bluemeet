@@ -44,7 +44,7 @@ export const client = new NodeOAuthClient({
     clientMetadata: {
         client_id: clientId,
         client_name: "Bluemeet",
-        redirect_uris: [`${process.env.NEXT_PUBLIC_URL}/api/bluesky`],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_URL?.replace("https", "http")}/api/bluesky`],
         response_types: ["code"],
         grant_types: ["authorization_code"],
     },
