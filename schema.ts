@@ -11,13 +11,17 @@ export const tokens = pgTable(
     (t) => [index("token_index").on(t.token)],
 );
 
-export const locations = pgTable("locations", {
-    did: text("did").primaryKey(),
-    latitude: doublePrecision("latitude").notNull(),
-    longitude: doublePrecision("longitude").notNull(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+export const locations = pgTable(
+    "locations",
+    {
+        did: text("did").primaryKey(),
+        latitude: doublePrecision("latitude").notNull(),
+        longitude: doublePrecision("longitude").notNull(),
+        createdAt: timestamp("created_at").notNull().defaultNow(),
+        updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    },
+    (t) => [index("locations_lat").on(t.latitude), index("locations_long").on(t.longitude)],
+);
 
 export const bskyOAuthStore = pgTable(
     "bsky_oauth_store",

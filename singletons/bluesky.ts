@@ -25,16 +25,19 @@ class NeonStoreBase<V> {
     }
 
     async set(key: string, value: V) {
-        await db.insert(bskyOAuthStore).values({
-            id: key,
-            session: this.session,
-            sessionData: value,
-        }).onConflictDoUpdate({
-            target: [bskyOAuthStore.id, bskyOAuthStore.session],
-            set: {
+        await db
+            .insert(bskyOAuthStore)
+            .values({
+                id: key,
+                session: this.session,
                 sessionData: value,
-            },
-        });
+            })
+            .onConflictDoUpdate({
+                target: [bskyOAuthStore.id, bskyOAuthStore.session],
+                set: {
+                    sessionData: value,
+                },
+            });
     }
 
     async del(key: string) {

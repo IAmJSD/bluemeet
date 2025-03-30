@@ -1,6 +1,5 @@
 import { getUser, signOut } from "@/lib/auth";
 import { locations } from "@/schema";
-import { algolia } from "@/singletons/algolia/server";
 import { db } from "@/singletons/db";
 import { eq } from "drizzle-orm";
 
@@ -41,10 +40,6 @@ export async function PATCH(request: Request) {
 
     if (body === null) {
         await db.delete(locations).where(eq(locations.did, user.did));
-        await algolia.deleteObject({
-            objectID: user.did,
-            indexName: "users",
-        });
     } else {
         await db
             .insert(locations)
@@ -60,17 +55,6 @@ export async function PATCH(request: Request) {
                     longitude: body.longitude,
                 },
             });
-        await algolia.partialUpdateObject({
-            objectID: user.did,
-            createIfNotExists: true,
-            attributesToUpdate: {
-                _geoloc: {
-                    lat: body.latitude,
-                    lng: body.longitude,
-                },
-            },
-            indexName: "users",
-        });
     }
 
     return new Response(null, {

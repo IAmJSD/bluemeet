@@ -37,7 +37,7 @@ type MapProps = {
     initLatitude: number;
     initLongitude: number;
     initZoom: number;
-    onMapChange: (latitude: number, longitude: number, zoom: number) => void;
+    onMapChange: (north: number, south: number, east: number, west: number) => void;
     setPointsListener: (listener: (points: Point[]) => void) => void;
 };
 
@@ -60,19 +60,15 @@ export default function Map({ initLatitude, initLongitude, initZoom, onMapChange
             L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
             }).addTo(map);
-            map.on("moveend", () => {
-                const latLng = map?.getCenter();
-                if (latLng) {
-                    onMapChange(latLng.lat, latLng.lng, map!.getZoom());
+            const search = () => {
+                const bounds = map?.getBounds();
+                if (bounds) {
+                    onMapChange(bounds.getNorth(), bounds.getSouth(), bounds.getEast(), bounds.getWest());
                 }
-            });
-            map.on("zoomend", () => {
-                const zoom = map?.getZoom();
-                if (zoom !== undefined) {
-                    const latLng = map!.getCenter();
-                    onMapChange(latLng.lat, latLng.lng, zoom);
-                }
-            });
+            };
+            search();
+            map.on("moveend", search);
+            map.on("zoomend", search);
         }
         return () => {
             if (map) {

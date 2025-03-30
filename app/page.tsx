@@ -2,7 +2,6 @@
 
 import Spinner from "@/components/Spinner";
 import { state } from "@/lib/state";
-import { algolia } from "@/singletons/algolia/client";
 import { getProfile } from "@/lib/profileCache";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
@@ -50,24 +49,20 @@ export default function Home() {
         setPointsState(points);
     };
 
-    const doSearch = async (latitude: number, longitude: number, zoom: number) => {
-        const results = await algolia.search({
-            requests: [
-                {
-                    indexName: "users",
-                    hitsPerPage: 100,
-                    page: 0,
-                    aroundLatLng: `${latitude}, ${longitude}`,
-                    aroundRadius: zoom * 10000,
-                },
-            ],
+    const doSearch = async (north: number, south: number, east: number, west: number) => {
+        const response = await fetch("/api/search", {
+            method: "POST",
+            body: JSON.stringify({ north, south, east, west }),
         });
-        // @ts-expect-error: the api is not typed.
-        const hits = results.results[0].hits as { objectID: string; _geoloc: { lat: number; lng: number } }[];
+        const hits: {
+            latitude: number;
+            longitude: number;
+            did: string;
+        }[] = await response.json();
 
         const toRemove: number[] = [];
         for (let i = 0; i < pointsRef.current.length; i++) {
-            if (!hits.find((hit) => hit.objectID === pointsRef.current[i].did)) {
+            if (!hits.find((hit) => hit.did === pointsRef.current[i].did)) {
                 toRemove.push(i);
             }
         }
@@ -79,26 +74,25 @@ export default function Home() {
         for (const hit of hits) {
             (async () => {
                 try {
-                    if (pointsRef.current.find((point) => point.did === hit.objectID)) {
+                    if (pointsRef.current.find((point) => point.did === hit.did)) {
                         return;
                     }
-                    console.log("Adding", hit.objectID, "points:", pointsRef.current);
-                    const user = await getProfile(hit.objectID);
+                    const user = await getProfile(hit.did);
                     if (user && ourNumber + 1 === lastSearchRef.current) {
                         setPoints([
                             ...pointsRef.current,
                             {
-                                did: hit.objectID,
-                                latitude: hit._geoloc.lat,
-                                longitude: hit._geoloc.lng,
+                                did: hit.did,
+                                latitude: hit.latitude,
+                                longitude: hit.longitude,
                                 pfp: user.avatar,
                                 name: user.displayName,
-                                url: `https://bsky.app/profile/${hit.objectID}`,
+                                url: `https://bsky.app/profile/${hit.did}`,
                             },
                         ]);
                     }
                 } catch (e) {
-                    console.error(`Error getting profile for ${hit.objectID}:`, e);
+                    console.error(`Error getting profile for ${hit.did}:`, e);
                 }
             })();
         }
@@ -115,12 +109,6 @@ export default function Home() {
             pointsHandler(points);
         }
     }, [pointsHandler, points]);
-
-    useEffect(() => {
-        if (ourLocation) {
-            doSearch(ourLocation.latitude, ourLocation.longitude, 13);
-        }
-    }, [ourLocation]);
 
     useEffect(() => {
         if (userLocationSetRef.current) {
@@ -155,7 +143,7 @@ export default function Home() {
                 <Map
                     initLatitude={ourLocation.latitude}
                     initLongitude={ourLocation.longitude}
-                    initZoom={13}
+                    initZoom={8}
                     onMapChange={doSearch}
                     setPointsListener={(v) => setPointsHandler(() => v)}
                 />
