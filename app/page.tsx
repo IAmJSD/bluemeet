@@ -41,6 +41,7 @@ export default function Home() {
     const lastSearchRef = useRef(0);
     const [points, setPointsState] = useState<Point[]>([]);
     const pointsRef = useRef(points);
+    const userLocationSetRef = useRef(false);
     const setPoints = (points: Point[]) => {
         pointsRef.current = points;
         setPointsState(points);
@@ -116,9 +117,21 @@ export default function Home() {
     }, [ourLocation]);
 
     useEffect(() => {
+        if (userLocationSetRef.current) {
+            // Don't override the user's location if it's already set.
+            return;
+        }
+        if (location) {
+            setOurLocation(location);
+            userLocationSetRef.current = true;
+        }
+    }, [location]);
+
+    useEffect(() => {
         if (applicationUser?.location) {
             // Jolt it to where we are on the map.
             setOurLocation(applicationUser.location);
+            userLocationSetRef.current = true;
         }
     }, [applicationUser]);
 
