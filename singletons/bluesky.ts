@@ -29,6 +29,11 @@ class NeonStoreBase<V> {
             id: key,
             session: this.session,
             sessionData: value,
+        }).onConflictDoUpdate({
+            target: [bskyOAuthStore.id, bskyOAuthStore.session],
+            set: {
+                sessionData: value,
+            },
         });
     }
 
