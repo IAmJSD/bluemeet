@@ -14,12 +14,12 @@ class NeonStoreBase<V> {
     constructor(private session: boolean) {}
 
     async get(key: string): Promise<V | undefined> {
-        const res = await db.select({
-            sessionData: bskyOAuthStore.sessionData,
-        }).from(bskyOAuthStore).where(and(
-            eq(bskyOAuthStore.id, key),
-            eq(bskyOAuthStore.session, this.session),
-        ));
+        const res = await db
+            .select({
+                sessionData: bskyOAuthStore.sessionData,
+            })
+            .from(bskyOAuthStore)
+            .where(and(eq(bskyOAuthStore.id, key), eq(bskyOAuthStore.session, this.session)));
         if (res.length === 0) return undefined;
         return res[0].sessionData as V;
     }
@@ -33,10 +33,9 @@ class NeonStoreBase<V> {
     }
 
     async del(key: string) {
-        await db.delete(bskyOAuthStore).where(and(
-            eq(bskyOAuthStore.id, key),
-            eq(bskyOAuthStore.session, this.session),
-        ));
+        await db
+            .delete(bskyOAuthStore)
+            .where(and(eq(bskyOAuthStore.id, key), eq(bskyOAuthStore.session, this.session)));
     }
 }
 

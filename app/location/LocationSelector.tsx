@@ -21,29 +21,32 @@ export default function LocationSelector({ location }: { location: { latitude: n
     const stateLocationRef = useRef(location);
     const [elLocation, setElLocation] = useState(location);
 
-    const handleSubmit = useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setLoading(true);
-        setError(null);
-        try {
-            const res = await fetch("/api/user", {
-                method: "PATCH",
-                body: JSON.stringify(selectedLocation),
-            });
-            if (!res.ok) {
-                const t = await res.text();
-                setError(t);
-                return;
+    const handleSubmit = useCallback(
+        async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            setLoading(true);
+            setError(null);
+            try {
+                const res = await fetch("/api/user", {
+                    method: "PATCH",
+                    body: JSON.stringify(selectedLocation),
+                });
+                if (!res.ok) {
+                    const t = await res.text();
+                    setError(t);
+                    return;
+                }
+                state.users.application.mutate((v) => {
+                    if (v) v.location = selectedLocation;
+                });
+            } catch {
+                setError("Failed to update location");
+            } finally {
+                setLoading(false);
             }
-            state.users.application.mutate((v) => {
-                if (v) v.location = selectedLocation;
-            });
-        } catch {
-            setError("Failed to update location");
-        } finally {
-            setLoading(false);
-        }
-    }, [selectedLocation]);
+        },
+        [selectedLocation],
+    );
 
     const clearLocaton = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -65,22 +68,18 @@ export default function LocationSelector({ location }: { location: { latitude: n
                 center: elLocation ? [elLocation.latitude, elLocation.longitude] : [0, 0],
                 zoom: elLocation ? 13 : 2,
             });
-            L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                { attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors" },
-            ).addTo(map);
-            const marker = L.marker(
-                elLocation ? [elLocation.latitude, elLocation.longitude] : [0, 0],
-                {
-                    draggable: true,
-                    icon: L.icon({
-                        iconUrl: "/images/marker-icon.png",
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                    }),
-                },
-            ).addTo(map);
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+            }).addTo(map);
+            const marker = L.marker(elLocation ? [elLocation.latitude, elLocation.longitude] : [0, 0], {
+                draggable: true,
+                icon: L.icon({
+                    iconUrl: "/images/marker-icon.png",
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                }),
+            }).addTo(map);
             marker.on("moveend", () => {
                 const latLng = marker.getLatLng();
                 setSelectedLocation({
@@ -100,8 +99,8 @@ export default function LocationSelector({ location }: { location: { latitude: n
         <form onSubmit={handleSubmit} aria-disabled={loading}>
             {error && <ErrorAlert error={error} />}
             <p className="mb-4">
-                <span className="font-bold">NOTE:</span> Be careful how close you set this to your actual location
-                since it is publicly visible.
+                <span className="font-bold">NOTE:</span> Be careful how close you set this to your actual location since
+                it is publicly visible.
             </p>
             <div ref={mapRef} className="w-[400px] h-[400px]" />
             <button onClick={clearLocaton}>Clear Location</button>

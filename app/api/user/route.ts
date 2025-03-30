@@ -24,12 +24,13 @@ export async function PATCH(request: Request) {
     let body: { latitude: number; longitude: number } | null;
     try {
         body = await request.json();
-        if (body !== null && (
-            typeof body !== "object" ||
-            Array.isArray(body) ||
-            typeof body.latitude !== "number" ||
-            typeof body.longitude !== "number"
-        )) {
+        if (
+            body !== null &&
+            (typeof body !== "object" ||
+                Array.isArray(body) ||
+                typeof body.latitude !== "number" ||
+                typeof body.longitude !== "number")
+        ) {
             throw 1;
         }
     } catch {
@@ -45,17 +46,20 @@ export async function PATCH(request: Request) {
             indexName: "users",
         });
     } else {
-        await db.insert(locations).values({
-            did: user.did,
-            latitude: body.latitude,
-            longitude: body.longitude,
-        }).onConflictDoUpdate({
-            target: [locations.did],
-            set: {
+        await db
+            .insert(locations)
+            .values({
+                did: user.did,
                 latitude: body.latitude,
                 longitude: body.longitude,
-            },
-        });
+            })
+            .onConflictDoUpdate({
+                target: [locations.did],
+                set: {
+                    latitude: body.latitude,
+                    longitude: body.longitude,
+                },
+            });
         await algolia.partialUpdateObject({
             objectID: user.did,
             createIfNotExists: true,

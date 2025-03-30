@@ -28,13 +28,12 @@ function ConsentScreen() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <p>
-                By logging in, you agree you are over 18 years of age. This service is not for minors.
-            </p>
+            <p>By logging in, you agree you are over 18 years of age. This service is not for minors.</p>
             <input
                 type="text"
                 className="w-full rounded-md border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-800 p-2 my-4"
-                value={input} onChange={(e) => setInput(e.target.value)}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
                 placeholder="Enter your Bluesky handle"
             />
             <Button type="submit" disabled={loading || input.length === 0}>
@@ -80,7 +79,8 @@ function UserMenu({ handle, avatar }: { handle: string; avatar: string | null })
 
         const handleClickOutside = (e: MouseEvent) => {
             if (
-                e.target instanceof HTMLElement && !e.target.closest(`#${CSS.escape(id)}`) &&
+                e.target instanceof HTMLElement &&
+                !e.target.closest(`#${CSS.escape(id)}`) &&
                 !buttonRef.current?.contains(e.target)
             ) {
                 setIsOpen(false);
@@ -97,27 +97,34 @@ function UserMenu({ handle, avatar }: { handle: string; avatar: string | null })
     return (
         <div>
             <button ref={buttonRef} onClick={() => setIsOpen((o) => !o)} aria-expanded={isOpen} aria-controls={id}>
-                {
-                    avatar ? <img src={avatar} aria-hidden={true} className="w-8 h-8 rounded-full inline-block" /> : null
-                }
+                {avatar ? <img src={avatar} aria-hidden={true} className="w-8 h-8 rounded-full inline-block" /> : null}
                 <span className="ml-2">{handle}</span>
             </button>
-            <div id={id} className={`absolute right-0 bg-white dark:bg-gray-800 shadow-lg rounded-md mt-2 mr-2 ${isOpen ? "" : "hidden"}`}>
-                <button onClick={() => {
-                    setIsOpen(false);
-                    fetch("/api/user", {
-                        method: "DELETE",
-                    }).then(() => {
-                        setStructureFromObject(state.users, {
-                            application: null,
-                            bluesky: null,
+            <div
+                id={id}
+                className={`absolute right-0 bg-white dark:bg-gray-800 shadow-lg rounded-md mt-2 mr-2 ${isOpen ? "" : "hidden"}`}
+            >
+                <button
+                    onClick={() => {
+                        setIsOpen(false);
+                        fetch("/api/user", {
+                            method: "DELETE",
+                        }).then(() => {
+                            setStructureFromObject(state.users, {
+                                application: null,
+                                bluesky: null,
+                            });
                         });
-                    });
-                }} className="text-left mt-2 w-full hover:bg-gray-100 dark:hover:bg-gray-700 p-2">
+                    }}
+                    className="text-left mt-2 w-full hover:bg-gray-100 dark:hover:bg-gray-700 p-2"
+                >
                     Logout
                 </button>
                 <Link href="/location">
-                    <div onClick={() => setIsOpen(false)} className="text-left my-2 w-full hover:bg-gray-100 dark:hover:bg-gray-700 p-2">
+                    <div
+                        onClick={() => setIsOpen(false)}
+                        className="text-left my-2 w-full hover:bg-gray-100 dark:hover:bg-gray-700 p-2"
+                    >
                         Set Location
                     </div>
                 </Link>
@@ -151,9 +158,7 @@ export default function Navbar() {
     return (
         <nav className="flex items-center justify-between p-4">
             <div className="flex items-center">
-                <Link href="/">
-                    Bluemeet
-                </Link>
+                <Link href="/">Bluemeet</Link>
             </div>
             <UserSidebarEntry />
         </nav>

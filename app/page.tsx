@@ -17,10 +17,13 @@ function UserBoxes({ points }: { points: Point[] }) {
                 <div className="flex flex-wrap">
                     {points.map((point) => (
                         <a key={point.did} href={point.url} target="_blank">
-                            <div style={{
-                                backgroundImage: `url(${CSS.escape(point.pfp ?? "/images/person.png")})`,
-                                backgroundSize: "cover",
-                            }} className="w-32 h-32">
+                            <div
+                                style={{
+                                    backgroundImage: `url(${CSS.escape(point.pfp ?? "/images/person.png")})`,
+                                    backgroundSize: "cover",
+                                }}
+                                className="w-32 h-32"
+                            >
                                 <div className="w-full h-full bg-black/40 flex flex-col justify-end">
                                     <div className="text-white text-sm p-2">{point.name}</div>
                                 </div>
@@ -60,7 +63,7 @@ export default function Home() {
             ],
         });
         // @ts-expect-error: the api is not typed.
-        const hits = (results.results[0].hits as { objectID: string; _geoloc: { lat: number; lng: number } }[]);
+        const hits = results.results[0].hits as { objectID: string; _geoloc: { lat: number; lng: number } }[];
 
         const toRemove: number[] = [];
         for (let i = 0; i < pointsRef.current.length; i++) {
@@ -82,14 +85,17 @@ export default function Home() {
                     console.log("Adding", hit.objectID, "points:", pointsRef.current);
                     const user = await getProfile(hit.objectID);
                     if (user && ourNumber + 1 === lastSearchRef.current) {
-                        setPoints([...pointsRef.current, {
-                            did: hit.objectID,
-                            latitude: hit._geoloc.lat,
-                            longitude: hit._geoloc.lng,
-                            pfp: user.avatar,
-                            name: user.displayName,
-                            url: `https://bsky.app/profile/${hit.objectID}`,
-                        }]);
+                        setPoints([
+                            ...pointsRef.current,
+                            {
+                                did: hit.objectID,
+                                latitude: hit._geoloc.lat,
+                                longitude: hit._geoloc.lng,
+                                pfp: user.avatar,
+                                name: user.displayName,
+                                url: `https://bsky.app/profile/${hit.objectID}`,
+                            },
+                        ]);
                     }
                 } catch (e) {
                     console.error(`Error getting profile for ${hit.objectID}:`, e);
@@ -147,8 +153,11 @@ export default function Home() {
         <main className="max-w-screen-lg mx-auto">
             <div className="h-[400px]">
                 <Map
-                    initLatitude={ourLocation.latitude} initLongitude={ourLocation.longitude}
-                    initZoom={13} onMapChange={doSearch} setPointsListener={(v) => setPointsHandler(() => v)}
+                    initLatitude={ourLocation.latitude}
+                    initLongitude={ourLocation.longitude}
+                    initZoom={13}
+                    onMapChange={doSearch}
+                    setPointsListener={(v) => setPointsHandler(() => v)}
                 />
             </div>
             <UserBoxes points={points} />

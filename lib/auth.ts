@@ -29,15 +29,19 @@ export async function signOut() {
 export async function getUser() {
     const token = (await cookies()).get("token")?.value;
     if (!token) return null;
-    const query = await db.select().from(tokens).leftJoin(
-        locations, eq(tokens.did, locations.did),
-    ).where(eq(tokens.token, token));
+    const query = await db
+        .select()
+        .from(tokens)
+        .leftJoin(locations, eq(tokens.did, locations.did))
+        .where(eq(tokens.token, token));
     if (query.length === 0) return null;
     return {
         did: query[0].tokens.did,
-        location: query[0].locations ? {
-            latitude: query[0].locations.latitude,
-            longitude: query[0].locations.longitude,
-        } : null,
+        location: query[0].locations
+            ? {
+                  latitude: query[0].locations.latitude,
+                  longitude: query[0].locations.longitude,
+              }
+            : null,
     };
 }

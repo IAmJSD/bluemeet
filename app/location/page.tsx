@@ -7,15 +7,14 @@ import { redirect } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
 
-const LocationSelector = dynamic(
-    () => import("./LocationSelector").then((mod) => mod.default),
-    { ssr: false },
-);
+const LocationSelector = dynamic(() => import("./LocationSelector").then((mod) => mod.default), { ssr: false });
 
 function SuspensedLocationSelector({ location }: { location: { latitude: number; longitude: number } | null }) {
-    return <Suspense fallback={<Spinner small={false} />}>
-        <LocationSelector location={location} />
-    </Suspense>;
+    return (
+        <Suspense fallback={<Spinner small={false} />}>
+            <LocationSelector location={location} />
+        </Suspense>
+    );
 }
 
 export default function LocationPage() {
@@ -30,7 +29,11 @@ export default function LocationPage() {
 
     return (
         <PageSkeleton title="Location" description="Set your location on the map so other users can find you.">
-            {applicationUser ? <SuspensedLocationSelector location={applicationUser.location} /> : <Spinner small={false} />}
+            {applicationUser ? (
+                <SuspensedLocationSelector location={applicationUser.location} />
+            ) : (
+                <Spinner small={false} />
+            )}
         </PageSkeleton>
     );
 }

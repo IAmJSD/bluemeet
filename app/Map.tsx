@@ -57,10 +57,9 @@ export default function Map({ initLatitude, initLongitude, initZoom, onMapChange
                     mapPoints(map, points, markers);
                 }
             });
-            L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                { attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors" },
-            ).addTo(map);
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+            }).addTo(map);
             map.on("moveend", () => {
                 const latLng = map?.getCenter();
                 if (latLng) {

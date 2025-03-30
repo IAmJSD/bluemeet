@@ -15,9 +15,7 @@ export default function PageSkeleton({ title, description, children }: Props) {
                 <h2 className="mt-2">{description}</h2>
                 <hr className="my-4" />
             </header>
-            <main>
-                {children}
-            </main>
+            <main>{children}</main>
         </div>
     );
 }

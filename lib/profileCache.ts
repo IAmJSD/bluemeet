@@ -14,13 +14,14 @@ export async function getProfile(did: string) {
     if (cached && cached[0] > now) {
         return cached[1];
     }
-    const promise = fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(did)}`)
-        .then(async (res) => {
-            if (!res.ok) {
-                throw new Error(`Failed to fetch profile for ${did}: ${res.status} ${await res.text()}`);
-            }
-            return await res.json() as Profile;
-        });
+    const promise = fetch(
+        `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${encodeURIComponent(did)}`,
+    ).then(async (res) => {
+        if (!res.ok) {
+            throw new Error(`Failed to fetch profile for ${did}: ${res.status} ${await res.text()}`);
+        }
+        return (await res.json()) as Profile;
+    });
     cache.set(did, [now + 1000 * 60 * 5, promise]);
     return promise;
 }
