@@ -17,9 +17,9 @@ function ConsentScreen() {
         fetch("/api/bluesky", {
             method: "POST",
             body: JSON.stringify(input),
-        }).then((res) => {
+        }).then(async (res) => {
             if (res.ok) {
-                window.location.href = res.url;
+                window.location.href = await res.text();
             } else {
                 setLoading(false);
             }
