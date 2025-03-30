@@ -47,6 +47,7 @@ export const client = new NodeOAuthClient({
         redirect_uris: [`${process.env.NEXT_PUBLIC_URL}/api/bluesky`],
         response_types: ["code"],
         grant_types: ["authorization_code"],
+        scope: "atproto transition:generic",
     },
     stateStore: new NeonStoreBase<NodeSavedState>(false),
     sessionStore: new NeonStoreBase<NodeSavedSession>(true),
